@@ -1,0 +1,11 @@
+npx lint-staged
+
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+  echo "\033[0;31m"
+  echo "❌ Commit blocked due to ESLint errors."
+  echo "Use 'yarn lint:fix' to try to automatically fix the errors."
+  echo "\033[0m"
+  exit 1
+fi
