@@ -4,6 +4,8 @@
 
 Nuxt 3
 
+Interfaces : NuxtUI
+
 ## Setup
 
 Make sure to install dependencies:
