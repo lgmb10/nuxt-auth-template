@@ -48,6 +48,8 @@ Le token est chiffré avec la lib jose en A256GCM
 
 Un middleware globale `auth.global.ts` va venir vérifier la présence et la validité d'un token à chaque changement de page, si ce n'est pas le cas, l'utilisateur est automatiquement redirigé vers la page de connexion (certaines pages ne sont pas concernés : login, register, reset-password et forgot-password)
 
+Si jamais un appel api nécessitant le token utilisateur reçoit un token expiré ou invalide renvoyant une erreur 401 durant des actions utilisateur sur une page, il est redirigé vers la page de login via une redirection 302 dans le `onResponseError` du `$fetch`
+
 ### Comment protéger une page à un rôle spécifique
 
 Le middleware `check-roles.ts` permet de limiter l'accès à une page en spécifiant un rôle, ainsi si l'utilisateur possède le rôle requis ou un rôle avec des droits supérieurs il peut accéder à la page, dans le cas contraire il sera redirigé vers la page de login avec un message d'erreur spécifique.
