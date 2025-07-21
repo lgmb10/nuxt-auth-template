@@ -10,10 +10,10 @@ export default defineNuxtConfig({
     },
     runtimeConfig: {
         jwtSecret: process.env.JWT_SECRET,
-        testEmail: process.env.TEST_EMAIL,
-        testPassword: process.env.TEST_PASSWORD,
         public: {
-            envApi: process.env.NUXT_PUBLIC_ENV_API || ""
+            envApi: process.env.NUXT_PUBLIC_ENV_API || "",
+            testEmail: process.env.TEST_EMAIL,
+            testPassword: process.env.TEST_PASSWORD
         }
     },
     css: ["~/assets/styles/main.css"],
