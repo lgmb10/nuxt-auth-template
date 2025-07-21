@@ -7,33 +7,33 @@ export function isJWTExpired(exp: number) {
 
 // Check if the user has the required role or superior role
 export async function checkRequiredRole(requiredRole: string) {
-    let user: User | null = null
+    let roles: string[] | null = null
     const requestFetch = useRequestFetch()
 
     try {
-        const res: string = await requestFetch(`/api/auth/user`)
-        user = JSON.parse(res) as User
+        const res: string = await requestFetch(`/api/auth/roles`)
+        roles = JSON.parse(res) as string[]
     } catch {
         return false
     }
 
-    if (isGranted(user?.roles as Array<string>, requiredRole)) return true
+    if (isGranted(roles as string[], requiredRole)) return true
     return false
 }
 
 // Check if user role corresponds to the required role
 export async function checkUserRole(role: string) {
-    let user: User | null = null
+    let roles: string[] | null = null
     const requestFetch = useRequestFetch()
 
     try {
-        const res: string = await requestFetch(`/api/auth/user`)
-        user = JSON.parse(res) as User
+        const res: string = await requestFetch(`/api/auth/roles`)
+        roles = JSON.parse(res) as string[]
     } catch {
         return false
     }
 
-    if (user?.roles[0] === role) return true
+    if (roles[0] === role) return true
     return false
 }
 

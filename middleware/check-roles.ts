@@ -3,13 +3,13 @@ import { isGranted } from "~/utils/auth"
 export default defineNuxtRouteMiddleware(async (to) => {
     const requiredRole: string = to.meta.requiredRole as string
     // let user: User | null = null
-    let roles: [string] | null = null
+    let roles: string[] | null = null
     const requestFetch = useRequestFetch()
     const toast = useToast()
 
     try {
-        const res = await requestFetch("/api/auth/roles")
-        roles = res as [string]
+        const res: string = await requestFetch("/api/auth/roles")
+        roles = JSON.parse(res) as string[]
     } catch (e) {
         console.error(e)
         toast.add({
