@@ -1,9 +1,13 @@
 import type { H3Event, EventHandlerRequest } from "h3"
-import type { UserCookie } from "../../types/user"
+import type { UserCookie, User } from "../../types/user"
 import { CompactEncrypt, compactDecrypt, decodeJwt } from "jose"
-import { sendResponse, sendJSONResponse } from "../utils/auth"
-import { isJWTExpired, getInfoFromJWT } from "../../app/utils/auth"
+import { sendResponse, isJWTExpired } from "../utils/auth"
+import { getInfoFromJWT } from "../../app/utils/auth"
 
+/**
+ *
+ * @returns Get JWT secret encryption key
+ */
 export function getJWESecret(): Uint8Array {
     const secret = useRuntimeConfig().jwtSecret
 
@@ -24,15 +28,17 @@ export function getJWESecret(): Uint8Array {
 
 /**
  *
- * @param userCookie Provide token from user cookie
+ * @param event Provide H3event from server api context
  * @param isLoggedIn Set at true if you want to only know if user is logged in with boolean and not provide token
  * @param getParsedToken Set at true if you want user infos from token, by default return token
- * @returns
+ * @param JSONResponse Set at true if you want a response formated to JSON
+ * @returns Get user JWT token or boolean as true if logged in
  */
 export const getUserToken = async (
     event: H3Event<EventHandlerRequest>,
     isLoggedIn: boolean = false,
-    getParsedToken: boolean = false
+    getParsedToken: boolean = false,
+    JSONReponse: boolean = false
 ): Promise<Response> => {
     const userCookie = await getUserFromCookie(event)
 
@@ -44,33 +50,60 @@ export const getUserToken = async (
                 try {
                     tokenParsed = decodeJwt(token.token)
                 } catch (error) {
-                    return sendResponse(error as string, 401)
+                    return sendResponse(error as string, 401, JSONReponse)
                 }
 
                 if (isJWTExpired(tokenParsed.exp)) {
-                    return sendResponse("Token expired", 401)
+                    return sendResponse("Token expired", 401, JSONReponse)
                 } else {
                     if (getParsedToken) {
-                        return sendJSONResponse(
+                        return sendResponse(
                             getInfoFromJWT(tokenParsed, true),
-                            200
+                            200,
+                            JSONReponse
                         )
                     } else {
                         return sendResponse(
                             isLoggedIn ? true : token.token,
-                            200
+                            200,
+                            JSONReponse
                         )
                     }
                 }
-            } else sendResponse("Token not found", 401)
+            } else sendResponse("Token not found", 401, JSONReponse)
         } catch {
-            return sendResponse("Cookie not found", 401)
+            return sendResponse("Cookie not found", 401, JSONReponse)
         }
     }
 
-    return sendResponse("Cookie not found", 400)
+    return sendResponse("Cookie not found", 400, JSONReponse)
 }
 
+/**
+ *
+ * @param event Provide H3event from server api context
+ * @returns Get user roles
+ */
+export const getUserRoles = async (
+    event: H3Event<EventHandlerRequest>
+): Promise<string[] | null> => {
+    const response = await getUserToken(event, false, true, true)
+
+    const user = await response.json()
+    const roles = (user as User).roles
+
+    if (response.status === 200) {
+        return roles
+    } else {
+        return null
+    }
+}
+
+/**
+ *
+ * @param event Provide H3event from server api context
+ * @returns get decrypted user Cookie
+ */
 export const getUserFromCookie = async (
     event: H3Event<EventHandlerRequest>
 ) => {
@@ -95,6 +128,12 @@ export const getUserFromCookie = async (
     }
 }
 
+/**
+ *
+ * @param event Provide H3event from server api context
+ * @param user Provide UserCookie with token and stayConnected
+ * @returns Get response if cookie created or reponse error
+ */
 export const setUserCookie = async (
     event: H3Event<EventHandlerRequest>,
     user: UserCookie
@@ -133,6 +172,11 @@ export const setUserCookie = async (
     }
 }
 
+/**
+ *
+ * @param event Provide H3event from server api context
+ * @returns Delete user cookie
+ */
 export const deleteUserCookie = (event: H3Event<EventHandlerRequest>) => {
     try {
         deleteCookie(event, "user", {
