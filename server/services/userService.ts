@@ -1,5 +1,5 @@
 import type { H3Event, EventHandlerRequest } from "h3"
-import type { UserCookie } from "~/types/user"
+import type { UserCookie } from "../../types/user"
 import { CompactEncrypt, compactDecrypt, decodeJwt } from "jose"
 import { isJWTExpired, sendResponse, getInfoFromJWT } from "~/utils/auth"
 
