@@ -1,23 +1,17 @@
-# Nuxt Minimal Starter
+# Nuxt Auth Template
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## Stack Technique
+
+Nuxt 3
+
+Interfaces : NuxtUI
 
 ## Setup
 
 Make sure to install dependencies:
 
 ```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
 yarn install
-
-# bun
-bun install
 ```
 
 ## Development Server
@@ -25,51 +19,68 @@ bun install
 Start the development server on `http://localhost:3000`:
 
 ```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
 yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+# Authentification
 
-Build the application for production:
+## Pourquoi une authentification côté serveur ?
 
-```bash
-# npm
-npm run build
+L'authentification est géré côté serveur de Nuxt dans /server car c'est la manière la plus sécurisé de gérer le stockage d'un token d'authentification :
 
-# pnpm
-pnpm build
+- Cela permet de centraliser les requêtes d’authentification via le serveur Nuxt, évitant ainsi que le client n’interagisse directement avec une API externe et puisse voir les urls.
+- Grâce à l'utilisation de la partie serveur, nous avons la possibilité de stocker le token dans un Cookie de type HttpOnly avec ces caractéristiques :
 
-# yarn
-yarn build
-
-# bun
-bun run build
+```ts
+httpOnly: true,
+secure: true,
+SameSite: "strict",
 ```
 
-Locally preview production build:
+- Le cookie HttpOnly est automatiquement envoyé par le navigateur lors des requêtes au serveur. Le backend peut ainsi récupérer et valider le token sans exposition côté client.
+- Le token n'est donc pas stocké dans un localStorage ou sessionStorage, qui sont accessibles par JavaScript et vulnérables aux attaques XSS.
 
-```bash
-# npm
-npm run preview
+L'attribut `secure:true` force l’envoi du cookie uniquement en HTTPS, empêchant l’interception sur une connexion non sécurisée.\
+L'attribut `SameSite: "strict"` empêche les requêtes cross-site d’inclure le cookie, ce qui réduit les risques d’attaques CSRF (Cross-Site Request Forgery)
 
-# pnpm
-pnpm preview
+Les informations utilisateur ne sont jamais stockées de façon pérenne dans un Store ou autre et ne sont récupérées que si nécessaire.
+Le token est chiffré avec la lib jose en A256GCM
 
-# yarn
-yarn preview
+## Fonctionnement dans le projet
 
-# bun
-bun run preview
+Un middleware globale `auth.global.ts` va venir vérifier la présence et la validité d'un token à chaque changement de page, si ce n'est pas le cas, l'utilisateur est automatiquement redirigé vers la page de connexion (certaines pages ne sont pas concernés : login, register, reset-password et forgot-password)
+
+Si jamais un appel api nécessitant le token utilisateur reçoit un token expiré ou invalide renvoyant une erreur 401 durant des actions utilisateur sur une page, il est redirigé vers la page de login via une redirection 302 dans le `onResponseError` du `$fetch`
+
+### Comment protéger une page à un rôle spécifique
+
+Le middleware `check-roles.ts` permet de limiter l'accès à une page en spécifiant un rôle, ainsi si l'utilisateur possède le rôle requis ou un rôle avec des droits supérieurs il peut accéder à la page, dans le cas contraire il sera redirigé vers la page de login avec un message d'erreur spécifique.
+
+Exemple d'utilisation :
+
+```ts
+<script lang="ts" setup>
+      definePageMeta({
+        middleware: "check-roles",
+        requiredRole: "ROLE_ADMIN"
+    })
+</script>
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+### Comment obtenir le rôle de l'utilisateur
+
+Il est possible qu'il y ai besoin de connaître le rôle de l'utilisateur pour des accès spécifiques dans une page. Par exemple un administrateur à accès à une page mais seul le super admin peut accéder à certaines fonctionnalités comme un bouton d'édition par exemple.
+
+Pour se faire il y a 2 méthodes :\
+
+- checkUserRole qui vérifie le type strict de l'utilisateur
+
+```ts
+const isSuperAdmin: Boolean = await checkUserRole("ROLE_SUPER_ADMIN")
+```
+
+- checkRequiredRole qui vérifie si l'utilisateur possède le rôle requis ou un rôle avec des droits supérieurs
+
+```ts
+const isAdmin: Boolean = await checkRequiredRole("ROLE_ADMIN")
+```
