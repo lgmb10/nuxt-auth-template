@@ -8,8 +8,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const toast = useToast()
 
     try {
-        const res: string = await requestFetch("/api/auth/roles")
-        roles = JSON.parse(res) as string[]
+        const res: string[] = await requestFetch("/api/auth/roles")
+        roles = res
     } catch (e) {
         console.error(e)
         toast.add({
