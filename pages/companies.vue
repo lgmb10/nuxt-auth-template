@@ -24,7 +24,7 @@
         name: filters.value.search,
         ["order[updatedAt]"]: "DESC"
     }
-    const { data: response, status } = await useAsyncData(() =>
+    const { data: response, status } = await useAsyncData("companies", () =>
         useApi().apiNewsletter.getAllCompanies(params)
     )
 </script>

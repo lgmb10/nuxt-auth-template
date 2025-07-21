@@ -1,5 +1,5 @@
 <template>
-    <div></div>
+    <div class="p-4 font-bold">This page required super admin role</div>
 </template>
 
 <script lang="ts" setup>
