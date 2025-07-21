@@ -1,12 +1,8 @@
 import type { H3Event, EventHandlerRequest } from "h3"
 import type { UserCookie } from "../../types/user"
 import { CompactEncrypt, compactDecrypt, decodeJwt } from "jose"
-import {
-    isJWTExpired,
-    sendResponse,
-    sendJSONResponse,
-    getInfoFromJWT
-} from "~/utils/auth"
+import { sendResponse, sendJSONResponse } from "../utils/auth"
+import { isJWTExpired, getInfoFromJWT } from "../../app/utils/auth"
 
 export function getJWESecret(): Uint8Array {
     const secret = useRuntimeConfig().jwtSecret

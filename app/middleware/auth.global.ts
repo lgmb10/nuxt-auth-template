@@ -1,5 +1,4 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-    let token: boolean | undefined = undefined
     let isLoggedIn: boolean = false
     let link: string | undefined = undefined
 
@@ -13,7 +12,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         const requestFetch = useRequestFetch()
 
         try {
-            token = await requestFetch("/api/auth")
+            const token: boolean | undefined = await requestFetch("/api/auth")
             isLoggedIn = !!token
         } catch {
             isLoggedIn = false

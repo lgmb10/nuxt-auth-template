@@ -1,4 +1,4 @@
-import { isGranted } from "~/utils/auth"
+import { isGranted } from "../utils/auth"
 
 export default defineNuxtRouteMiddleware(async (to) => {
     const requiredRole: string = to.meta.requiredRole as string
