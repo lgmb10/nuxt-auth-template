@@ -1,5 +1,5 @@
 import { getUserToken } from "../../services/userService"
-import type { User } from "~/types/user"
+import type { User } from "../../../types/user"
 import { sendResponse } from "~/utils/auth"
 
 // Get roles infos from token
