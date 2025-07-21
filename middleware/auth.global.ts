@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-    let token: string | undefined = undefined
+    let token: boolean | undefined = undefined
     let isLoggedIn: boolean = false
     let link: string | undefined = undefined
 
@@ -39,7 +39,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     // Redirect to homepage if user is already logged in
     if (to.name === "login" && isLoggedIn) {
         try {
-            await $fetch("/api/logout")
+            await $fetch("/api/auth/logout")
         } catch (error) {
             console.error(error as string)
         }

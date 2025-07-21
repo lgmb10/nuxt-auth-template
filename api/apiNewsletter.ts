@@ -7,7 +7,7 @@ export const apiNewsletter = (baseUrl: string) => {
             Accept: "*/*"
         },
         async onRequest({ options }) {
-            const token = await requestFetch("/api/auth")
+            const token = await requestFetch("/api/auth/token")
 
             if (token) {
                 const headers = new Headers(options.headers)
@@ -23,7 +23,7 @@ export const apiNewsletter = (baseUrl: string) => {
             console.error("Erreur de réponse:", response.statusText)
 
             if (response.status === 401) {
-                await requestFetch("/api/logout")
+                await requestFetch("/api/auth/logout")
                 if (!import.meta.server)
                     await navigateTo("/login", { redirectCode: 302 })
             }

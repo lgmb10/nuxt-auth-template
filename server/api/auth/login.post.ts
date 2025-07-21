@@ -1,4 +1,4 @@
-import { setUserCookie } from "../services/userService"
+import { setUserCookie } from "../../services/userService"
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)

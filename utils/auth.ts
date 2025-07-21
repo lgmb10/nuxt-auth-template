@@ -1,4 +1,5 @@
 import type { User } from "~/types/user"
+import { decodeJwt } from "jose"
 
 export function isJWTExpired(exp: number) {
     return Date.now() >= exp * 1000
@@ -10,7 +11,7 @@ export async function checkRequiredRole(requiredRole: string) {
     const requestFetch = useRequestFetch()
 
     try {
-        const res: string = await requestFetch(`/api/user`)
+        const res: string = await requestFetch(`/api/auth/user`)
         user = JSON.parse(res) as User
     } catch {
         return false
@@ -26,7 +27,7 @@ export async function checkUserRole(role: string) {
     const requestFetch = useRequestFetch()
 
     try {
-        const res: string = await requestFetch(`/api/user`)
+        const res: string = await requestFetch(`/api/auth/user`)
         user = JSON.parse(res) as User
     } catch {
         return false
@@ -53,7 +54,7 @@ export function getInfoFromJWT(jwtToken: object | string, isParsed: boolean) {
 
     if (!isParsed) {
         try {
-            tokenParsed = parseJwt(jwtToken as string)
+            tokenParsed = decodeJwt(jwtToken as string)
         } catch {
             return null
         }
@@ -92,4 +93,13 @@ export function parseJwt(token: string) {
 
 export function sendResponse(e: string, code: number) {
     return new Response(e, { status: code })
+}
+
+export function sendJSONResponse(e: object, code: number) {
+    return new Response(JSON.stringify(e), {
+        status: code,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
 }

@@ -1,6 +1,7 @@
 import type { H3Event, EventHandlerRequest } from "h3"
 import type { UserCookie } from "~/types/user"
-import { CompactEncrypt, compactDecrypt } from "jose"
+import { CompactEncrypt, compactDecrypt, decodeJwt } from "jose"
+import { isJWTExpired, sendResponse, getInfoFromJWT } from "~/utils/auth"
 
 export function getJWESecret(): Uint8Array {
     const secret = useRuntimeConfig().jwtSecret
@@ -18,6 +19,55 @@ export function getJWESecret(): Uint8Array {
     }
 
     return keyBuffer
+}
+
+/**
+ *
+ * @param userCookie Provide token from user cookie
+ * @param isLoggedIn Set at true if you want to only know if user is logged in with boolean and not provide token
+ * @param getParsedToken Set at true if you want user infos from token, by default return token
+ * @returns
+ */
+export const getUserToken = async (
+    event: H3Event<EventHandlerRequest>,
+    isLoggedIn: boolean = false,
+    getParsedToken: boolean = false
+): Promise<Response> => {
+    const userCookie = await getUserFromCookie(event)
+
+    if (userCookie) {
+        try {
+            const token = JSON.parse(userCookie)
+            if (token.token) {
+                let tokenParsed = null
+                try {
+                    tokenParsed = decodeJwt(token.token)
+                } catch (error) {
+                    return sendResponse(error as string, 401)
+                }
+
+                if (isJWTExpired(tokenParsed.exp)) {
+                    return sendResponse("Token expired", 401)
+                } else {
+                    if (getParsedToken) {
+                        return sendResponse(
+                            JSON.stringify(getInfoFromJWT(tokenParsed, true)),
+                            200
+                        )
+                    } else {
+                        return sendResponse(
+                            isLoggedIn ? true : token.token,
+                            200
+                        )
+                    }
+                }
+            } else sendResponse("Token not found", 401)
+        } catch {
+            return sendResponse("Cookie not found", 401)
+        }
+    }
+
+    return sendResponse("Cookie not found", 400)
 }
 
 export const getUserFromCookie = async (

@@ -65,7 +65,7 @@
     const schema = object({
         email: string().email("format de l'email incorrecte").required(),
         password: string()
-            .min(8, "Doit contenir au moins 8 caractères")
+            .min(3, "Doit contenir au moins 8 caractères")
             .required()
     })
 
@@ -79,14 +79,17 @@
     async function onSubmit() {
         isLoading.value = true
         try {
-            const res: { statusCode: number } = await $fetch("/api/login", {
-                method: "POST",
-                body: JSON.stringify({
-                    email: state.email,
-                    password: state.password,
-                    stayConnected: true
-                })
-            })
+            const res: { statusCode: number } = await $fetch(
+                "/api/auth/login",
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        email: state.email,
+                        password: state.password,
+                        stayConnected: true
+                    })
+                }
+            )
 
             if (res.statusCode === 200) {
                 let previousPage: string | null = null
