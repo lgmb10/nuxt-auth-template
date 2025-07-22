@@ -1,9 +1,7 @@
 <template>
     <div class="h-screen mx-auto flex items-center">
         <div class="mx-auto w-96">
-            <h1 class="text-4xl font-bold text-center mb-5">
-                Nuxt Auth Template
-            </h1>
+            <h2 class="text-4xl font-bold text-center mb-5">Connexion</h2>
             <UForm
                 :schema="schema"
                 :state="state"
@@ -41,12 +39,17 @@
                 <div class="flex justify-center">
                     <UButton
                         type="submit"
-                        class="cursor-pointer"
+                        class="cursor-pointer mt-2"
                         :loading="isLoading">
                         Se connecter
                     </UButton>
                 </div>
             </UForm>
+            <NuxtLink
+                :to="{ name: 'forgot-password' }"
+                class="pt-4 block text-center"
+                >Mot de passe oublié ?</NuxtLink
+            >
         </div>
     </div>
 </template>
