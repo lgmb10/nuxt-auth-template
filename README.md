@@ -2,7 +2,8 @@
 
 ## Stack Technique
 
-Nuxt 3
+Nuxt 4
+Vue 3.5
 
 Interfaces : NuxtUI
 
