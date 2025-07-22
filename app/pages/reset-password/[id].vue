@@ -139,7 +139,7 @@
 
         try {
             const res: { statusCode: number } = await $fetch(
-                "/api/reset-password",
+                "/api/auth/reset-password",
                 {
                     method: "POST",
                     body: JSON.stringify({

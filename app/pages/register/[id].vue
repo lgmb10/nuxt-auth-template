@@ -147,13 +147,16 @@
         isLoading.value = true
 
         try {
-            const res: { statusCode: number } = await $fetch("/api/register", {
-                method: "POST",
-                body: JSON.stringify({
-                    token: route.params.id,
-                    password: state.password
-                })
-            })
+            const res: { statusCode: number } = await $fetch(
+                "/api/auth/register",
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        token: route.params.id,
+                        password: state.password
+                    })
+                }
+            )
 
             if (res.statusCode === 200) {
                 toast.add({
