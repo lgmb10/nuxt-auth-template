@@ -75,8 +75,8 @@
     })
 
     const state = reactive({
-        email: testEmail,
-        password: testPassword
+        email: testEmail || "",
+        password: testPassword || ""
     })
 
     const toast = useToast()

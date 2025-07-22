@@ -81,7 +81,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { object, string } from "yup"
+    import { object, string, ref as yupRef } from "yup"
 
     definePageMeta({
         layout: "empty"
@@ -99,8 +99,11 @@
             .min(4, "Doit contenir au moins 4 caractères")
             .required(),
         confirmPassword: string()
-            .min(4, "Doit contenir au moins 4 caractères")
-            .required()
+            .oneOf(
+                [yupRef("password")],
+                "Les mots de passes ne sont pas identiques"
+            )
+            .required("Confirmation du mot de passe requise")
     })
 
     const state = reactive({
@@ -132,14 +135,6 @@
     }
 
     async function onSubmit() {
-        if (state.password.length && state.password !== state.confirmPassword) {
-            toast.add({
-                title: "Erreur",
-                description: "Les mots de passes ne sont pas identiques",
-                color: "error"
-            })
-            return
-        }
         isLoading.value = true
 
         try {
