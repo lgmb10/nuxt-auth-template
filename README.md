@@ -72,7 +72,7 @@ Exemple d'utilisation :
 
 Il est possible qu'il y ai besoin de connaître le rôle de l'utilisateur pour des accès spécifiques dans une page. Par exemple un administrateur à accès à une page mais seul le super admin peut accéder à certaines fonctionnalités comme un bouton d'édition par exemple.
 
-Pour se faire il y a 2 méthodes :\
+Pour se faire il y a 2 méthodes :
 
 - checkUserRole qui vérifie le type strict de l'utilisateur
 
