@@ -77,11 +77,11 @@ Pour se faire il y a 2 méthodes :\
 - checkUserRole qui vérifie le type strict de l'utilisateur
 
 ```ts
-const isSuperAdmin: Boolean = await checkUserRole("ROLE_SUPER_ADMIN")
+const isSuperAdmin: boolean = await checkUserRole("ROLE_SUPER_ADMIN")
 ```
 
 - checkRequiredRole qui vérifie si l'utilisateur possède le rôle requis ou un rôle avec des droits supérieurs
 
 ```ts
-const isAdmin: Boolean = await checkRequiredRole("ROLE_ADMIN")
+const isAtLeastAdmin: boolean = await checkRequiredRole("ROLE_ADMIN")
 ```
